@@ -1,0 +1,9 @@
+[submodule "libraries/GFX"]
+	path = libraries/GFX
+	url = https://github.com/adafruit/Adafruit-GFX-Library.git
+[submodule "libraries/Max72xxPanel"]
+	path = libraries/Max72xxPanel
+	url = https://github.com/markruys/arduino-Max72xxPanel.git
+[submodule "libraries/Readline"]
+	path = libraries/Readline
+	url = https://github.com/timotto/Readline.git
