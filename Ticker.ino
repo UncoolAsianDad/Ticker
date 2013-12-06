@@ -4,9 +4,11 @@
 #include <Readline.h>
 #include <SoftwareSerial.h>  
 #include <Time.h>
+#include <stdio.h>
 
 // Read a line in from stream
 ReadLine r;
+char tmp[64] = "";
 
 // Bluetooth Stream
 //int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
@@ -22,6 +24,8 @@ int numberOfVerticalDisplays = 1;
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 
 String tape = "Booting...";
+
+
 int wait = 50; // In milliseconds
 
 int spacer = 1;
@@ -52,8 +56,7 @@ void writeChars() {
   }
 }
 
-
-void setup() {
+void startBT() {
 
   Serial.begin(115200);  // The Bluetooth Mate defaults to 115200bps
   Serial.print("$");
@@ -63,40 +66,45 @@ void setup() {
   Serial.println("U,9600,N");  // Temporarily Change the baudrate to 9600, no parity
   delay(500);  // Short delay, wait for the Mate finish switching back to Data
   Serial.end();
-
-
   // 115200 can be too fast at times for NewSoftSerial to relay the data reliably
   Serial.begin(9600);  // Start bluetooth serial at 9600
 
-    matrix.setIntensity(7); // Use a value between 0 and 15 for brightness
-  // Adjust to your own needs
-  //  matrix.setPosition(0, 0, 0); // The first display is at <0, 0>
-  //  matrix.setPosition(1, 1, 0); // The second display is at <1, 0>
-  //  matrix.setPosition(2, 2, 0); // The third display is at <2, 0>
-  //  matrix.setPosition(3, 3, 0); // And the last display is at <3, 0>
-  //  ...
-  //  matrix.setRotation(0, 2);    // The first display is position upside down
-  //  matrix.setRotation(3, 2);    // The same hold for the last display
+}
 
-  setTime(1357041600);
+void stopBT() {
+
+  Serial.print("$");
+  Serial.print("$");
+  Serial.print("$");
+  delay(100);  // Short delay, wait for the Mate to send back CMD
+  Serial.println("R,1");  // Temporarily Change the baudrate to 9600, no parity
+  delay(500);  // Short delay, wait for the Mate finish switching back to Data
+  Serial.end();
+}
+
+void setup() {
+  matrix.setIntensity(7); // Use a value between 0 and 15 for brightness
+
+  //  setTime(1386311613);
 }
 
 void loop() {
-  //  while(==0) {}
-  //  tape = r.feed(&Serial);
-  tape = hour();
 
   if (Serial.available() > 0 ) {
     tape = r.feed(&Serial);
     Serial.println(tape);
   }
 
-  writeChars();
+  //  writeChars();
+  //  sprintf(tmp,"%02d:%02d:%02d", hour(),minute(),second());
+  //  tape = String(tmp);
+
+  for (int i=0;i<matrix.width();i++) {
+    matrix.fillScreen(LOW);
+    matrix.drawLine(0,0,i,i,1);
+    matrix.drawPixel(matrix.width()/2, matrix.height()/2, 1);
+
+    delay(1000);
+  }
 }
-
-
-
-
-
-
 
